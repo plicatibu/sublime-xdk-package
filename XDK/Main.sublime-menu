@@ -1,11 +1,8 @@
-[
-{	
-	"id": "edit",
-	"children": [
-		{
-			"caption": "AAAAAAAAAA",
-			"command:": "xdk_run_emulator"
-		}
-	]
-}
-]
+[{
+	"id": "XDK",
+	"caption": "XDK",
+	"children": [{
+		"command": "xdk_run_emulator",
+		"caption": "Run XDK emulator"
+	}]
+}]
