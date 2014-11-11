@@ -2,22 +2,25 @@ import sublime, sublime_plugin
 import os
 import json
 import urllib
-from urllib.parse import urlparse
+#from urllib.parse import urlparse
 
 ### CONFIGURATION
 CONFIG_FILE = os.path.join( os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
 MSGS = {
-	'CONFIG_FILE_IS_EMPTY': 'Configuration file is empty or not created. Please enter correct XDK folder in the prompt above.',
-	'CONFIG_STRING_IS_NOT_DIR': 'Path specified in configuration is not accessable. Please enter correct XDK folder in the prompt above.',
-	'SPECIFIED_DIRECTORY_IS_NOT_XDK': 'Path specified in configuration is not XDK one. Please enter correct XDK folder in the prompt above.',
+	'CONFIG_FILE_IS_EMPTY': 'Configuration file is empty or not created. Please enter correct XDK folder in the prompt below.',
+	'CONFIG_STRING_IS_NOT_DIR': 'Path specified in configuration is not accessable. Please enter correct XDK folder in the prompt below.',
+	'SPECIFIED_DIRECTORY_IS_NOT_XDK': 'Path specified in configuration is not XDK one. Please enter correct XDK folder in the prompt below.',
 	'CAN_NOT_PARSE_SERVER_DATA': 'Can not parse XDK server data file.',
-	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to XDK.'
+	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to XDK.',
+	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have XDK running?'
 }
 ### E.O. CONFIGURATION
 
 class XDKException(Exception):
-	def __init__(self, value):
+	need_configuration = False
+	def __init__(self, value, need_configuration=False):
 		self.value = value
+		self.need_configuration = need_configuration
 	def __str__(self):
 		return repr(self.value)
 
@@ -38,11 +41,15 @@ class XDKPluginCore:
 
 	def make_request(self, addr, params={}, headers={}):
 		print('make_request: addr=', addr);
-		parsed = urlparse(addr)
+		#parsed = urlparse(addr)
+		#parsed = urllib.parse.urlparse(addr)
 		params = urllib.parse.urlencode(params).encode('utf-8')
 		#request = urllib.request.Request(addr, headers=headers, data=params)
-		request = urllib.request.Request(addr, params, headers)
-		response = urllib.request.urlopen(request)
+		try:
+			request = urllib.request.Request(addr, params, headers)
+			response = urllib.request.urlopen(request)
+		except: 
+			raise XDKException(MSGS['XDK_CONNECTION_FAILED']); 
 		return response
 
 	def make_simple_request(self, addr, params={}, headers={}):
@@ -60,15 +67,15 @@ class XDKPluginCore:
 			self.config_contents = f.read();
 		print('load_config_data: CONFIG_FILE read')
 		if not self.config_contents:
-			raise XDKException(MSGS['CONFIG_FILE_IS_EMPTY']);
+			raise XDKException(MSGS['CONFIG_FILE_IS_EMPTY'], True);
 		self.xdk_dir = self.config_contents.strip()
 		print('load_config_data: xdk_dir=' + self.xdk_dir)
 		if not os.path.exists(self.xdk_dir) or not os.path.exists(self.xdk_dir):
-			raise XDKException(MSGS['CONFIG_STRING_IS_NOT_DIR']);
+			raise XDKException(MSGS['CONFIG_STRING_IS_NOT_DIR'], True);
 		self.server_data_path = os.path.join(self.xdk_dir, 'server-data.txt')
 		print('load_config_data: server_data_path=', self.server_data_path)
 		if not os.path.isfile(self.server_data_path):
-			raise XDKException(MSGS['SPECIFIED_DIRECTORY_IS_NOT_XDK'])
+			raise XDKException(MSGS['SPECIFIED_DIRECTORY_IS_NOT_XDK'], True)
 		server_data_contents = None;
 		with open(self.server_data_path, 'r') as f:
 			server_data_contents = f.read()
@@ -83,7 +90,7 @@ class XDKPluginCore:
 			print('load_config_data: base_path=' + self.base_path);
 			print('load_config_data: plugin_base_path=' + self.plugin_base_path);
 		except:
-			raise XDKException(MSGS['CAN_NOT_PARSE_SERVER_DATA']);
+			raise XDKException(MSGS['CAN_NOT_PARSE_SERVER_DATA'], True);
 
 	def authorize(self):
 		if self.auth_cookie is not None:
@@ -135,7 +142,8 @@ class XDKPluginCore:
 				self.authorize();
 			except XDKException as e:
 				sublime.error_message(e.value);
-				self.show_configuration_prompt()
+				if e.need_configuration:
+					self.show_configuration_rompt()
 
 
 
