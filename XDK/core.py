@@ -5,14 +5,16 @@ import urllib
 #from urllib.parse import urlparse
 
 ### CONFIGURATION
-CONFIG_FILE = os.path.join( os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
 MSGS = {
 	'CONFIG_FILE_IS_EMPTY': 'Configuration file is empty or not created. Please enter correct XDK folder in the prompt below.',
 	'CONFIG_STRING_IS_NOT_DIR': 'Path specified in configuration is not accessable. Please enter correct XDK folder in the prompt below.',
 	'SPECIFIED_DIRECTORY_IS_NOT_XDK': 'Path specified in configuration is not XDK one. Please enter correct XDK folder in the prompt below.',
 	'CAN_NOT_PARSE_SERVER_DATA': 'Can not parse XDK server data file.',
 	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to XDK.',
-	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have XDK running?'
+	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have XDK running?',
+
+	'CAN_NOT_GET_FOLDER': 'Can not get current folder. Do you have project folder opened?'
 }
 ### E.O. CONFIGURATION
 
@@ -52,14 +54,31 @@ class XDKPluginCore:
 			raise XDKException(MSGS['XDK_CONNECTION_FAILED']); 
 		return response
 
-	def make_simple_request(self, addr, params={}, headers={}):
-		response = self.make_request(addr, params, headers);
-		return response.status == 200;
+	#def make_simple_request(self, addr, params={}, headers={}):
+	#	response = self.make_request(addr, params, headers);
+	#	return response.status == 200;
+
+	def invoke_command(self, cmd):
+		def _make_request():
+			return self.make_request(self.plugin_base_path, cmd, {
+				'Cookie' : self.auth_cookie
+			})
+
+		response = _make_request();
+		# if authentication failed - try authenticate again
+		if response.status == 401:
+			self.reset_authorization()
+			self.prepare()
+			response = _make_request()
+			return response.code == 200
+		else:
+			return response.code == 200
+
 
 
 	def load_config_data(self):
-		if self.server_data_path is not None:
-			print('load_config_data: already has server_data_path')
+		if self.plugin_base_path is not None:
+			print('load_config_data: already has plugn_base_path')
 			return
 
 		print('load_config_data: trying to read CONFIG_FILE=', CONFIG_FILE);
@@ -127,23 +146,17 @@ class XDKPluginCore:
 		window = self.view.window();
 		window.show_input_panel('Enter XDK folder:', '', self._on_configuration_done, self._on_configuration_changed, self._on_configuration_canceled)
 		
-	def send_command(self, cmd):
-		self.make_simple_request(self.plugin_base_path, cmd)
 
 	def prepare(self):
 		try:
 			self.load_config_data()
 			self.authorize()
 		except XDKException as e:
-			# May be user reopened XDK? Try again.
-			self.reset_authorization();
-			try:
-				self.load_config_data();
-				self.authorize();
-			except XDKException as e:
-				sublime.error_message(e.value);
-				if e.need_configuration:
-					self.show_configuration_rompt()
+			sublime.error_message(e.value);
+			if e.need_configuration:
+				self.show_configuration_prompt()
+			return False
+		return True
 
 
 
