@@ -6,6 +6,39 @@
 			"command": "xdk_run_emulator",
 			"caption": "Run XDK emulator"
 		}, {
+			"caption": "Test",
+			"children": [{
+				"command": "xdk_run_test_push_files",
+				"caption": "Push files to testing server"
+			}, {
+				"command": "xdk_run_test_begin_debugging",
+				"caption": "Begin debugging on device"
+			}]
+		}, {
+			"caption": "Debug",
+			"children": [{
+				"command": "xdk_run_debug_launch_app",
+				"caption": "Launch App on device"
+			}, {
+				"command": "xdk_run_debug_debug_app",
+				"caption": "Debug App on device"
+			}, {
+				"command": "xdk_run_debug_stop_app",
+				"caption": "Stop App on device"
+			}]
+		}, {
+			"caption": "Profile",
+			"children": [{
+				"command": "xdk_run_profile_start",
+				"caption": "Start profiling"
+			}, {
+				"command": "xdk_run_profile_stop",
+				"caption": "Stop profiling"
+			}, {
+				"command": "xdk_run_profile_close_app",
+				"caption": "Close app"
+			}]
+		}, {
 			"caption": "-"
 		}, {
 			"command": "xdk_configure",
