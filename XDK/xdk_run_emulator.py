@@ -25,6 +25,7 @@ class XdkRunEmulatorCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 
 class XdkConfigureCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
+		# TODO: provide user with instructions?
 		self.show_configuration_prompt()
 
 

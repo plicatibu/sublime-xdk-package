@@ -1,8 +1,15 @@
 [{
 	"id": "XDK",
 	"caption": "XDK",
-	"children": [{
-		"command": "xdk_run_emulator",
-		"caption": "Run XDK emulator"
-	}]
+	"children": [
+		{
+			"command": "xdk_run_emulator",
+			"caption": "Run XDK emulator"
+		}, {
+			"caption": "-"
+		}, {
+			"command": "xdk_configure",
+			"caption": "Set up XDK integration"
+		}
+	]
 }]

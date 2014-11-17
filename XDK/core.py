@@ -2,6 +2,7 @@ import sublime, sublime_plugin
 import os
 import json
 import urllib
+import sys
 #from urllib.parse import urlparse
 
 ### CONFIGURATION
@@ -43,36 +44,42 @@ class XDKPluginCore:
 
 	def make_request(self, addr, params={}, headers={}):
 		print('make_request: addr=', addr);
-		#parsed = urlparse(addr)
-		#parsed = urllib.parse.urlparse(addr)
-		params = urllib.parse.urlencode(params).encode('utf-8')
-		#request = urllib.request.Request(addr, headers=headers, data=params)
-		try:
-			request = urllib.request.Request(addr, params, headers)
-			response = urllib.request.urlopen(request)
-		except: 
-			raise XDKException(MSGS['XDK_CONNECTION_FAILED']); 
-		return response
+		#params = urllib.parse.urlencode(params).encode('utf-8')
+		#params_str = json.dumps(json)
+		if params:
+			params = json.dumps(params)
+			headers['Content-Type'] = 'application/json'
+		else:
+			params = ''
 
-	#def make_simple_request(self, addr, params={}, headers={}):
-	#	response = self.make_request(addr, params, headers);
-	#	return response.status == 200;
+
+		request = urllib.request.Request(addr, params.encode('utf-8'), headers)
+		response = urllib.request.urlopen(request)
+		return response
 
 	def invoke_command(self, cmd):
 		def _make_request():
-			return self.make_request(self.plugin_base_path, cmd, {
-				'Cookie' : self.auth_cookie
-			})
+			try: 
+				return self.make_request(self.plugin_base_path, cmd, {
+					'Cookie' : self.auth_cookie
+				})
+			except urllib.error.HTTPError as e:
+				if (e.code == 401): 
+					self.reset_authorization()
+					self.prepare()
+					return self.make_request(self.plugin_base_path, cmd, {
+						'Cookie' : self.auth_cookie
+					})
+				else:
+					raise
 
-		response = _make_request();
-		# if authentication failed - try authenticate again
-		if response.status == 401:
-			self.reset_authorization()
-			self.prepare()
+		try:
 			response = _make_request()
-			return response.code == 200
-		else:
-			return response.code == 200
+		except:
+			print('ERROR=');
+			print(dir(sys.exc_info()[0]))
+			sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
+
 
 
 
@@ -156,6 +163,10 @@ class XDKPluginCore:
 			if e.need_configuration:
 				self.show_configuration_prompt()
 			return False
+		except urllib.error.HTTPError:
+			sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
+		except:
+			sublime.error_message('Error: ' + str(e.value))
 		return True
 
 
