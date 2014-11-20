@@ -1,0 +1,28 @@
+[{
+	"keys": ["alt+super+e"],
+	"command": "xdk_run_emulator"
+}, {
+	"keys": ["alt+super+p"],
+	"command": "xdk_run_test_push_files"
+}, {
+	"keys": ["alt+super+d"],
+	"command": "xdk_run_test_begin_debugging"
+}, {
+	"keys": ["alt+super+l"],
+	"command": "xdk_run_debug_launch_app"
+}, {
+	"keys": ["ctrl+super+d"],
+	"command": "xdk_run_debug_debug_app"
+}, {
+	"keys": ["ctrl+super+q"],
+	"command": "xdk_run_debug_stop_app"
+}, {
+	"keys": ["alt+super+s"],
+	"command": "xdk_run_profile_start"
+}, {
+	"keys": ["ctrl+super+s"],
+	"command": "xdk_run_profile_stop"
+}, {
+	"keys": ["alt+super+c"],
+	"command": "xdk_run_profile_close_app"
+}]
