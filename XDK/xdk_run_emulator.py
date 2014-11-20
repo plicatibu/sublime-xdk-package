@@ -55,7 +55,7 @@ class XdkRunTestBeginDebuggingCommand(sublime_plugin.TextCommand, XDK.core.XDKPl
 		filename = self.view.file_name()
 		self.invoke_command({
 			'action': 'run_test',
-			'method': 'push_files',
+			'method': 'begin_debugging',
 			'folder': folder,
 			'filename': filename
 		})
@@ -100,7 +100,7 @@ class XdkRunDebugStopAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCo
 	def run(self, edit):
 		if not self.prepare(): return
 		try:
-			folder = self.view.window.folders()[0]
+			folder = self.view.window().folders()[0]
 		except:
 			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
 			return
@@ -119,7 +119,7 @@ class XdkRunProfileStartCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCo
 	def run(self, edit):
 		if not self.prepare(): return
 		try:
-			folder = self.view.window.folders()[0]
+			folder = self.view.window().folders()[0]
 		except:
 			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
 			return
@@ -136,7 +136,7 @@ class XdkRunProfileStopCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCor
 	def run(self, edit):
 		if not self.prepare(): return
 		try:
-			folder = self.view.window.folders()[0]
+			folder = self.view.window().folders()[0]
 		except:
 			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
 			return
@@ -153,7 +153,7 @@ class XdkRunProfileCloseAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPlugi
 	def run(self, edit):
 		if not self.prepare(): return
 		try:
-			folder = self.view.window.folders()[0]
+			folder = self.view.window().folders()[0]
 		except:
 			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
 			return
@@ -174,7 +174,21 @@ class XdkConfigureCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 		# TODO: provide user with instructions?
 		self.show_configuration_prompt()
 
+#########################################################
 
+class XdkShowAboutCommand(sublime_plugin.ApplicationCommand):
+	def run(self):
+		sublime.message_dialog("""Intel® XDK HTML5 Cross-platform Development Tool enables developers to easily design, test, debug, and build HTML5 web and hybrid apps across multiple app stores and form factor devices.  
+
+The Intel XDK plugin for Sublime Text* allows you to drive your HTML5 app emulation, testing, profiling, and builds from within Sublime Text; you just need to set up your project within the Intel XDK first.  
+
+See XXX for more information about the Intel XDK Sublime Text* plugin.  
+
+Please see http://xdk.intel.com for more information about the Intel XDK and for support.
+
+*Other names and brands may be claimed as the property of others.   
+Copyright (c) 2013-2014 Intel Corporation. All Rights Reserved.
+""")
 
 
 		
