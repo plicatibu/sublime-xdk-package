@@ -1,10 +1,10 @@
 [{
 	"id": "XDK",
-	"caption": "XDK",
+	"caption": "Intel XDK",
 	"children": [
 		{
 			"command": "xdk_run_emulator",
-			"caption": "Run XDK emulator"
+			"caption": "Run emulator"
 		}, {
 			"caption": "Test",
 			"children": [{
@@ -43,6 +43,11 @@
 		}, {
 			"command": "xdk_configure",
 			"caption": "Set up XDK integration"
+		}, {
+			"caption": "-"
+		}, {
+			"command": "xdk_show_about",
+			"caption": "About Intel XDK"
 		}
 	]
 }]
