@@ -1,12 +1,12 @@
 import sublime, sublime_plugin
 import os
 import json
-import urllib
+import urllib.request
 import sys
-#from urllib.parse import urlparse
 
 ### CONFIGURATION
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
+API_VERSION = '0.0.1'
 MSGS = {
 	'CONFIG_FILE_IS_EMPTY': 'Configuration file is empty or not created. Please enter correct XDK folder in the prompt below.',
 	'CONFIG_STRING_IS_NOT_DIR': 'Path specified in configuration is not accessable. Please enter correct XDK folder in the prompt below.',
@@ -14,8 +14,8 @@ MSGS = {
 	'CAN_NOT_PARSE_SERVER_DATA': 'Can not parse XDK server data file.',
 	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to XDK.',
 	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have XDK running?',
-
-	'CAN_NOT_GET_FOLDER': 'Can not get current folder. Do you have project folder opened?'
+	'CAN_NOT_GET_FOLDER': 'Can not get current folder. Do you have project folder opened?',
+	'CAN_NOT_PARSE_RESPONSE_JSON': 'Can not parse response JSON'
 }
 ### E.O. CONFIGURATION
 
@@ -47,6 +47,7 @@ class XDKPluginCore:
 		#params = urllib.parse.urlencode(params).encode('utf-8')
 		#params_str = json.dumps(json)
 		if params:
+			params['_api_version'] = API_VERSION
 			params = json.dumps(params)
 			headers['Content-Type'] = 'application/json'
 		else:
@@ -64,7 +65,9 @@ class XDKPluginCore:
 					'Cookie' : self.auth_cookie
 				})
 			except urllib.error.HTTPError as e:
-				if (e.code == 401): 
+				print("CAUGHT!!!' " + str(e.code))
+				if (int(e.code) == 401):
+					print('TRYING TO GET NEW ONE'); 
 					self.reset_authorization()
 					self.prepare()
 					return self.make_request(self.plugin_base_path, cmd, {
@@ -75,9 +78,26 @@ class XDKPluginCore:
 
 		try:
 			response = _make_request()
+			content = response.read()
+			print('CONTENT=')
+			print(content);
+			try:
+				parsed = json.loads(content.decode())
+			except:
+				raise XDKException(MSGS['CAN_NOT_PARSE_RESPONSE_JSON'])
+		
+			if 'error' in parsed and parsed['error']:
+				error_msg = parsed['msg'] if 'msg' in parsed else 'Unknown error' 
+				raise XDKException(error_msg)
+
+		except XDKException as e:
+			sublime.error_message(e.value)
 		except:
 			print('ERROR=');
-			print(dir(sys.exc_info()[0]))
+			exc = sys.exc_info()[0];
+			print(exc.reason);
+			print(exc.strerror)
+			print(exc)
 			sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
 
 
