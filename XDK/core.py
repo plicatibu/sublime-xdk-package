@@ -155,7 +155,7 @@ class XDKPluginCore:
 
 	def reset_authorization(self):
 		self.auth_secret = None
-		self.auto_cookie = None
+		self.auth_cookie = None
 
 	def _on_configuration_changed(self, val):
 		pass
