@@ -15,7 +15,8 @@ MSGS = {
 	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to XDK.',
 	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have XDK running?',
 	'CAN_NOT_GET_FOLDER': 'Can not get current folder. Do you have project folder opened?',
-	'CAN_NOT_PARSE_RESPONSE_JSON': 'Can not parse response JSON'
+	'CAN_NOT_PARSE_RESPONSE_JSON': 'Can not parse response JSON',
+	'CAN_NOT_FIND_XDK': 'Can not find XDK installation'
 }
 ### E.O. CONFIGURATION
 
@@ -93,13 +94,22 @@ class XDKPluginCore:
 		except XDKException as e:
 			sublime.error_message(e.value)
 		except:
-			print('ERROR=');
-			exc = sys.exc_info()[0];
-			print(exc.reason);
-			print(exc.strerror)
-			print(exc)
 			sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
 
+
+	def get_data_path(self):
+		p = sys.platform
+		path = None
+		if p == 'darwin':
+			path = os.path.join(os.getenv('HOME'), 'Library', 'Application Support', 'XDK')
+		elif p == 'win32':
+			path = os.path.join(os.getenv('LOCALAPPDATA'), 'XDK')
+		elif p == 'linux2':
+			path = os.path.join(os.getenv('HOME'), '.config', 'XDK')
+		server_data = os.path.join(path, 'server-data.txt')
+		if path is None or not os.path.isfile(server_data) or not os.access(server_data, os.R_OK):
+			raise XDKException(MSGS['CAN_NOT_FIND_XDK']) 
+		return path
 
 
 
@@ -113,11 +123,12 @@ class XDKPluginCore:
 			self.config_contents = f.read();
 		print('load_config_data: CONFIG_FILE read')
 		if not self.config_contents:
-			raise XDKException(MSGS['CONFIG_FILE_IS_EMPTY'], True);
+			#raise XDKException(MSGS['CONFIG_FILE_IS_EMPTY'], True);
+			self.find_xdk_installation()
 		self.xdk_dir = self.config_contents.strip()
 		print('load_config_data: xdk_dir=' + self.xdk_dir)
-		if not os.path.exists(self.xdk_dir) or not os.path.exists(self.xdk_dir):
-			raise XDKException(MSGS['CONFIG_STRING_IS_NOT_DIR'], True);
+		#if not os.path.exists(self.xdk_dir) or not os.path.exists(self.xdk_dir):
+		#	raise XDKException(MSGS['CONFIG_STRING_IS_NOT_DIR'], True);
 		self.server_data_path = os.path.join(self.xdk_dir, 'server-data.txt')
 		print('load_config_data: server_data_path=', self.server_data_path)
 		if not os.path.isfile(self.server_data_path):
@@ -157,37 +168,51 @@ class XDKPluginCore:
 		self.auth_secret = None
 		self.auth_cookie = None
 
-	def _on_configuration_changed(self, val):
-		pass
 
-	def _on_configuration_canceled(self, val):
-		pass
+	# def _on_configuration_changed(self, val):
+	# 	pass
 
-	def _on_configuration_done(self, value):
+	# def _on_configuration_canceled(self, val):
+	# 	pass
+
+	# def _on_configuration_done(self, value):
+	# 	with open(CONFIG_FILE, 'w') as f:
+	# 		f.write(value);
+	# 	self.prepare();
+
+
+	# def show_configuration_prompt(self): 
+	# 	window = self.view.window();
+	# 	window.show_input_panel('Enter XDK folder:', '', self._on_configuration_done, self._on_configuration_changed, self._on_configuration_canceled)
+
+
+	
+	def find_xdk_installation(self):
+		print('SELF.XDK_DIR=' + str(self.xdk_dir))
+		if self.xdk_dir is not None:
+			print('find_xdk_installation: self.xdk_dir is not none')
+			return self.xdk_dir 	
+		path = self.get_data_path()
+		print('find_xdk_installation: found path' + path)
 		with open(CONFIG_FILE, 'w') as f:
-			f.write(value);
-		self.prepare();
-
-
-	def show_configuration_prompt(self): 
-		window = self.view.window();
-		window.show_input_panel('Enter XDK folder:', '', self._on_configuration_done, self._on_configuration_changed, self._on_configuration_canceled)
-		
+			f.write(path);		
 
 	def prepare(self):
 		try:
+			self.find_xdk_installation()
 			self.load_config_data()
 			self.authorize()
 		except XDKException as e:
 			sublime.error_message(e.value);
-			if e.need_configuration:
-				self.show_configuration_prompt()
-			return False
+			#if e.need_configuration:
+			#	self.show_configuration_prompt()
+			#return False
 		except urllib.error.HTTPError:
 			sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
-		except:
-			sublime.error_message('Error: ' + str(e.value))
+		#except e:
+		#	sublime.error_message('Error: ' + str(e.value))
 		return True
+
 
 
 

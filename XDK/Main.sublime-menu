@@ -1,6 +1,6 @@
 [{
 	"id": "XDK",
-	"caption": "Intel XDK",
+	"caption": "Intel® XDK",
 	"children": [
 		{
 			"command": "xdk_run_emulator",
@@ -47,7 +47,7 @@
 			"caption": "-"
 		}, {
 			"command": "xdk_show_about",
-			"caption": "About Intel XDK"
+			"caption": "About Intel® XDK"
 		}
 	]
 }]

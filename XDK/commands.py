@@ -172,7 +172,8 @@ class XdkRunProfileCloseAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPlugi
 class XdkConfigureCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		# TODO: provide user with instructions?
-		self.show_configuration_prompt()
+		self.find_xdk_installation()
+		self.prepare()
 
 #########################################################
 
