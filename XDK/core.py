@@ -165,8 +165,10 @@ class XDKPluginCore:
 		print('authorize: auth_cookie=', self.auth_cookie);
 
 	def reset_authorization(self):
+		self.xdk_dir = None
 		self.auth_secret = None
 		self.auth_cookie = None
+		self.plugin_base_path = None
 
 
 	# def _on_configuration_changed(self, val):
@@ -207,8 +209,18 @@ class XDKPluginCore:
 			#if e.need_configuration:
 			#	self.show_configuration_prompt()
 			#return False
-		except urllib.error.HTTPError:
-			sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
+		#except urllib.error.HTTPError:
+		#	sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
+		#except ConnectionRefusedError:
+		#	sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
+		except Exception as e:
+			if (
+					isinstance(e, urllib.error.HTTPError) or
+					isinstance(e, urllib.error.URLError) or
+					isinstance(e, ConnectionRefusedError)
+				):
+				sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
+
 		#except e:
 		#	sublime.error_message('Error: ' + str(e.value))
 		return True
