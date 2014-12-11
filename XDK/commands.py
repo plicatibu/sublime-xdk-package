@@ -6,22 +6,17 @@ from XDK.core import MSGS
 #	def run(self, edit):
 #		self.view.insert(edit, 0, "Hello, World!")
 
+
+
 class XdkRunEmulatorCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
 
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
-
-		filename = self.view.file_name()
-		self.invoke_command({
-			'action': 'run_emulate',
-			'folder': folder,
-			'filename': filename
+		data = self.prepare_request_data()
+		data.update({
+			'action': 'run_emulate'
 		})
+		self.invoke_command(data);
 
 #########################################################
 
@@ -29,142 +24,93 @@ class XdkRunTestPushFilesCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginC
 	def run(self, edit):
 		if not self.prepare(): return
 
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
-
-		filename = self.view.file_name()
-		self.invoke_command({
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_test',
-			'method': 'push_files',
-			'folder': folder,
-			'filename': filename
+			'method': 'push_files'
 		})
-		
+		self.invoke_command(data);
+
 class XdkRunTestBeginDebuggingCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
 
-		filename = self.view.file_name()
-		self.invoke_command({
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_test',
-			'method': 'begin_debugging',
-			'folder': folder,
-			'filename': filename
+			'method': 'begin_debugging'
 		})
+		self.invoke_command(data)
 
 #########################################################
 
 class XdkRunDebugLaunchAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
-		try: 
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
-
-		filename = self.view.file_name()
-		self.invoke_command({
+		
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_debug',
-			'method': 'launch_app',
-			'folder': folder,
-			'filename': filename
+			'method': 'launch_app'
 		})
+		self.invoke_command(data)
 
 class XdkRunDebugDebugAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
-
-		filename = self.view.file_name()
-		self.invoke_command({
+		
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_debug',
-			'method': 'debug_app',
-			'folder': folder,
-			'filename': filename
+			'method': 'debug_app'
 		})
+		self.invoke_command(data)
 
 class XdkRunDebugStopAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
-
-		filename = self.view.file_name()
-		self.invoke_command({
+		
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_debug',
-			'method': 'stop_app',
-			'folder': folder,
-			'filename': filename
+			'method': 'stop_app'
 		})
+		self.invoke_command(data)
 
 #########################################################
 
 class XdkRunProfileStartCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
-
-		filename = self.view.file_name()
-		self.invoke_command({
+		
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_profile',
-			'method': 'start',
-			'folder': folder,
-			'filename': filename
+			'method': 'start'
 		})
+		self.invoke_command(data)
 
 class XdkRunProfileStopCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
 
-		filename = self.view.file_name()
-		self.invoke_command({
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_profile',
-			'method': 'stop',
-			'folder': folder,
-			'filename': filename
+			'method': 'stop'
 		})
+		self.invoke_command(data)
 
 class XdkRunProfileCloseAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
-		try:
-			folder = self.view.window().folders()[0]
-		except:
-			sublime.error_message(MSGS['CAN_NOT_GET_FOLDER'])
-			return
 
-		filename = self.view.file_name()
-		self.invoke_command({
+		data = self.prepare_request_data()
+		data.update({
 			'action': 'run_profile',
-			'method': 'close_app',
-			'folder': folder,
-			'filename': filename
+			'method': 'close_app'
 		})
+		self.invoke_command(data)
 
 #########################################################
 

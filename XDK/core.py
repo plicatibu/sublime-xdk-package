@@ -3,6 +3,7 @@ import os
 import json
 import urllib.request
 import sys
+import re
 
 ### CONFIGURATION
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
@@ -224,6 +225,18 @@ class XDKPluginCore:
 		#except e:
 		#	sublime.error_message('Error: ' + str(e.value))
 		return True
+
+	def prepare_request_data(self):
+		folder = self.view.window().folders()[0]
+		regex = re.compile('.*\.xdk(e)?$')
+		xdk_files = [ f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f)) and regex.match(f) ]
+		#return len(xdk_files) > 0
+		return {
+			'folder': 				folder,
+			'contains_xdk_file': 	len(xdk_files) > 1,
+			'filename': 			self.view.file_name()
+		}
+
 
 
 
