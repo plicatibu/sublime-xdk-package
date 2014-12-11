@@ -124,12 +124,9 @@ class XDKPluginCore:
 			self.config_contents = f.read();
 		print('load_config_data: CONFIG_FILE read')
 		if not self.config_contents:
-			#raise XDKException(MSGS['CONFIG_FILE_IS_EMPTY'], True);
 			self.find_xdk_installation()
 		self.xdk_dir = self.config_contents.strip()
 		print('load_config_data: xdk_dir=' + self.xdk_dir)
-		#if not os.path.exists(self.xdk_dir) or not os.path.exists(self.xdk_dir):
-		#	raise XDKException(MSGS['CONFIG_STRING_IS_NOT_DIR'], True);
 		self.server_data_path = os.path.join(self.xdk_dir, 'server-data.txt')
 		print('load_config_data: server_data_path=', self.server_data_path)
 		if not os.path.isfile(self.server_data_path):
@@ -141,7 +138,6 @@ class XDKPluginCore:
 		try:
 			decoded = json.loads(server_data_contents.replace('[END]', ''))
 			self.auth_secret = decoded['secret']
-			# TODO: Replace this!
 			self.base_path = 'http://localhost:' + str(decoded['port']);
 			self.plugin_base_path = 'http://localhost:' + str(decoded['port']) + '/http-services/plugin-listener/plugin/entrance'
 			print('load_config_data: auth_secret=' + self.auth_secret);
@@ -170,25 +166,6 @@ class XDKPluginCore:
 		self.auth_secret = None
 		self.auth_cookie = None
 		self.plugin_base_path = None
-
-
-	# def _on_configuration_changed(self, val):
-	# 	pass
-
-	# def _on_configuration_canceled(self, val):
-	# 	pass
-
-	# def _on_configuration_done(self, value):
-	# 	with open(CONFIG_FILE, 'w') as f:
-	# 		f.write(value);
-	# 	self.prepare();
-
-
-	# def show_configuration_prompt(self): 
-	# 	window = self.view.window();
-	# 	window.show_input_panel('Enter XDK folder:', '', self._on_configuration_done, self._on_configuration_changed, self._on_configuration_canceled)
-
-
 	
 	def find_xdk_installation(self):
 		print('SELF.XDK_DIR=' + str(self.xdk_dir))
@@ -207,13 +184,7 @@ class XDKPluginCore:
 			self.authorize()
 		except XDKException as e:
 			sublime.error_message(e.value);
-			#if e.need_configuration:
-			#	self.show_configuration_prompt()
-			#return False
-		#except urllib.error.HTTPError:
-		#	sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
-		#except ConnectionRefusedError:
-		#	sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
+			
 		except Exception as e:
 			if (
 					isinstance(e, urllib.error.HTTPError) or
@@ -221,16 +192,12 @@ class XDKPluginCore:
 					isinstance(e, ConnectionRefusedError)
 				):
 				sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
-
-		#except e:
-		#	sublime.error_message('Error: ' + str(e.value))
 		return True
 
 	def prepare_request_data(self):
 		folder = self.view.window().folders()[0]
 		regex = re.compile('.*\.xdk(e)?$')
 		xdk_files = [ f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f)) and regex.match(f) ]
-		#return len(xdk_files) > 0
 		return {
 			'folder': 				folder,
 			'contains_xdk_file': 	len(xdk_files) > 1,
