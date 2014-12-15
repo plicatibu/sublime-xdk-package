@@ -2,12 +2,6 @@ import sublime, sublime_plugin
 import XDK.core
 from XDK.core import MSGS
 
-#class ExampleCommand(sublime_plugin.TextCommand):
-#	def run(self, edit):
-#		self.view.insert(edit, 0, "Hello, World!")
-
-
-
 class XdkRunEmulatorCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return

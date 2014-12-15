@@ -8,6 +8,7 @@ import re
 ### CONFIGURATION
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
 API_VERSION = '0.0.1'
+DEBUG_ENABLED = False
 MSGS = {
 	'CONFIG_FILE_IS_EMPTY': 'Configuration file is empty or not created. Please enter correct XDK folder in the prompt below.',
 	'CONFIG_STRING_IS_NOT_DIR': 'Path specified in configuration is not accessable. Please enter correct XDK folder in the prompt below.',
@@ -20,6 +21,10 @@ MSGS = {
 	'CAN_NOT_FIND_XDK': 'Can not find XDK installation'
 }
 ### E.O. CONFIGURATION
+
+def _print(*args):
+	if DEBUG_ENABLED:
+		print(*args)
 
 class XDKException(Exception):
 	need_configuration = False
@@ -45,7 +50,7 @@ class XDKPluginCore:
 	auth_cookie = None
 
 	def make_request(self, addr, params={}, headers={}):
-		print('make_request: addr=', addr);
+		_print('make_request: addr=', addr);
 		#params = urllib.parse.urlencode(params).encode('utf-8')
 		#params_str = json.dumps(json)
 		if params:
@@ -67,9 +72,9 @@ class XDKPluginCore:
 					'Cookie' : self.auth_cookie
 				})
 			except urllib.error.HTTPError as e:
-				print("CAUGHT!!!' " + str(e.code))
+				_print("Caught HTTPError' " + str(e.code))
 				if (int(e.code) == 401):
-					print('TRYING TO GET NEW ONE'); 
+					_print('401, trying to get new one'); 
 					self.reset_authorization()
 					self.prepare()
 					return self.make_request(self.plugin_base_path, cmd, {
@@ -81,8 +86,8 @@ class XDKPluginCore:
 		try:
 			response = _make_request()
 			content = response.read()
-			print('CONTENT=')
-			print(content);
+			_print('invoke_command: content=')
+			_print(content);
 			try:
 				parsed = json.loads(content.decode())
 			except:
@@ -116,50 +121,50 @@ class XDKPluginCore:
 
 	def load_config_data(self):
 		if self.plugin_base_path is not None:
-			print('load_config_data: already has plugn_base_path')
+			_print('load_config_data: already has plugn_base_path')
 			return
 
-		print('load_config_data: trying to read CONFIG_FILE=', CONFIG_FILE);
+		_print('load_config_data: trying to read CONFIG_FILE=', CONFIG_FILE);
 		with open(CONFIG_FILE, 'r') as f:
 			self.config_contents = f.read();
-		print('load_config_data: CONFIG_FILE read')
+		_print('load_config_data: CONFIG_FILE read')
 		if not self.config_contents:
 			self.find_xdk_installation()
 		self.xdk_dir = self.config_contents.strip()
-		print('load_config_data: xdk_dir=' + self.xdk_dir)
+		_print('load_config_data: xdk_dir=' + self.xdk_dir)
 		self.server_data_path = os.path.join(self.xdk_dir, 'server-data.txt')
-		print('load_config_data: server_data_path=', self.server_data_path)
+		_print('load_config_data: server_data_path=', self.server_data_path)
 		if not os.path.isfile(self.server_data_path):
 			raise XDKException(MSGS['SPECIFIED_DIRECTORY_IS_NOT_XDK'], True)
 		server_data_contents = None;
 		with open(self.server_data_path, 'r') as f:
 			server_data_contents = f.read()
-		print('load_config_data: server_data_contents=' + server_data_contents);	
+		_print('load_config_data: server_data_contents=' + server_data_contents);	
 		try:
 			decoded = json.loads(server_data_contents.replace('[END]', ''))
 			self.auth_secret = decoded['secret']
 			self.base_path = 'http://localhost:' + str(decoded['port']);
 			self.plugin_base_path = 'http://localhost:' + str(decoded['port']) + '/http-services/plugin-listener/plugin/entrance'
-			print('load_config_data: auth_secret=' + self.auth_secret);
-			print('load_config_data: base_path=' + self.base_path);
-			print('load_config_data: plugin_base_path=' + self.plugin_base_path);
+			_print('load_config_data: auth_secret=' + self.auth_secret);
+			_print('load_config_data: base_path=' + self.base_path);
+			_print('load_config_data: plugin_base_path=' + self.plugin_base_path);
 		except:
 			raise XDKException(MSGS['CAN_NOT_PARSE_SERVER_DATA'], True);
 
 	def authorize(self):
 		if self.auth_cookie is not None:
-			print('authorize: auth_cookie is not none');
+			_print('authorize: auth_cookie is not none');
 			return 
 
-		print('authorize: making request to /validate');	
+		_print('authorize: making request to /validate');	
 		response = self.make_request(self.base_path + '/validate', {}, {'x-xdk-local-session-secret': self.auth_secret });
 		cookies = dict(response.info().items())
-		print('authorize: response.status=' + str(response.status));
-		print('authorize: cookies length=', len(cookies));
+		_print('authorize: response.status=' + str(response.status));
+		_print('authorize: cookies length=', len(cookies));
 		if response.status != 200 or 'Set-Cookie' not in cookies: 
 			raise XDKException(MSGS['CAN_NOT_VALIDATE_SECRET_KEY']);
 		self.auth_cookie = cookies['Set-Cookie']
-		print('authorize: auth_cookie=', self.auth_cookie);
+		_print('authorize: auth_cookie=', self.auth_cookie);
 
 	def reset_authorization(self):
 		self.xdk_dir = None
@@ -168,12 +173,12 @@ class XDKPluginCore:
 		self.plugin_base_path = None
 	
 	def find_xdk_installation(self):
-		print('SELF.XDK_DIR=' + str(self.xdk_dir))
+		_print('find_xdk_installation: self.xdk_dir=' + str(self.xdk_dir))
 		if self.xdk_dir is not None:
-			print('find_xdk_installation: self.xdk_dir is not none')
+			_print('find_xdk_installation: self.xdk_dir is not none')
 			return self.xdk_dir 	
 		path = self.get_data_path()
-		print('find_xdk_installation: found path' + path)
+		_print('find_xdk_installation: found path' + path)
 		with open(CONFIG_FILE, 'w') as f:
 			f.write(path);		
 
