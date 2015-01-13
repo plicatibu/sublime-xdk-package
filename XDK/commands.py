@@ -73,14 +73,26 @@ class XdkRunDebugStopAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCo
 
 #########################################################
 
-class XdkRunProfileStartCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
+class XdkRunProfileCpuStartCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare(): return
 		
 		data = self.prepare_request_data()
 		data.update({
 			'action': 'run_profile',
-			'method': 'start'
+			'method': 'start_cpu_profiling'
+		})
+		self.invoke_command(data)
+
+
+class XdkRunProfileMemoryStartCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
+	def run(self, edit):
+		if not self.prepare(): return
+		
+		data = self.prepare_request_data()
+		data.update({
+			'action': 'run_profile',
+			'method': 'start_memory_profiling'
 		})
 		self.invoke_command(data)
 
