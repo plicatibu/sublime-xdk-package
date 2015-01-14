@@ -18,7 +18,10 @@
 	"command": "xdk_run_debug_stop_app"
 }, {
 	"keys": ["alt+super+s"],
-	"command": "xdk_run_profile_start"
+	"command": "xdk_run_profile_cpu_start"
+},{
+	"keys": ["alt+super+a"],
+	"command": "xdk_run_profile_memory_start"
 }, {
 	"keys": ["ctrl+super+s"],
 	"command": "xdk_run_profile_stop"
