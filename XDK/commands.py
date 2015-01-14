@@ -2,132 +2,109 @@ import sublime, sublime_plugin
 import XDK.core
 from XDK.core import MSGS
 
-class XdkRunEmulatorCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
+class XdkCommand_(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 	def run(self, edit):
-		if not self.prepare(): return
+		if not self.prepare():
+			return
+		self.invoke_command(self.prepare_data())
 
+########## EMULATOR 
+
+class XdkRunEmulatorCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_emulate'
-		})
-		self.invoke_command(data);
+		data.update(action='run_emulate')
+		return data
 
-#########################################################
+########## TEST 
 
-class XdkRunTestPushFilesCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-
+class XdkRunTestPushFilesCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_test',
-			'method': 'push_files'
-		})
-		self.invoke_command(data);
+		data.update(
+			action='run_test', 
+			method='push_files'
+		)
+		return data
 
-class XdkRunTestBeginDebuggingCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-
+class XdkRunTestBeginDebuggingCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_test',
-			'method': 'begin_debugging'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_test',
+			method='begin_debugging'
+		)
+		return data
 
-#########################################################
 
-class XdkRunDebugLaunchAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-		
+########## DEBUG
+
+class XdkRunDebugLaunchAppCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_debug',
-			'method': 'launch_app'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_debug',
+			method='launch_app'
+		)
+		return data
 
-class XdkRunDebugDebugAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-		
+class XdkRunDebugDebugAppCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_debug',
-			'method': 'debug_app'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_debug',
+			method='debug_app'
+		)
+		return data
 
-class XdkRunDebugStopAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-		
+class XdkRunDebugStopAppCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_debug',
-			'method': 'stop_app'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_debug',
+			method='stop_app'
+		)
+		return data
 
-#########################################################
+########## PROFILE
 
-class XdkRunProfileCpuStartCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-		
+class XdkRunProfileCpuStartCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_profile',
-			'method': 'start_cpu_profiling'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_profile',
+			method='start_cpu_profiling'
+		)
+		return data
 
-
-class XdkRunProfileMemoryStartCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-		
+class XdkRunProfileMemoryStartCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_profile',
-			'method': 'start_memory_profiling'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_profile',
+			method='start_memory_profiling'
+		)
+		return data
 
-class XdkRunProfileStopCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-
+class XdkRunProfileStopCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_profile',
-			'method': 'stop'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_profile',
+			method='stop'
+		)
+		return data
 
-class XdkRunProfileCloseAppCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		if not self.prepare(): return
-
+class XdkRunProfileCloseAppCommand(XdkCommand_):
+	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update({
-			'action': 'run_profile',
-			'method': 'close_app'
-		})
-		self.invoke_command(data)
+		data.update(
+			action='run_profile',
+			method='close_app'
+		)
+		return data
 
-#########################################################
-
-
-class XdkConfigureCommand(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
-	def run(self, edit):
-		# TODO: provide user with instructions?
-		self.find_xdk_installation()
-		self.prepare()
-
-#########################################################
+########## ABOUT
 
 class XdkShowAboutCommand(sublime_plugin.ApplicationCommand):
 	def run(self):

@@ -56,6 +56,7 @@ class XDKPluginCore:
 		if params:
 			params['_api_version'] = API_VERSION
 			params = json.dumps(params)
+			_print('make_request: params=' + str(params))
 			headers['Content-Type'] = 'application/json'
 		else:
 			params = ''
