@@ -8,17 +8,15 @@ import re
 ### CONFIGURATION
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
 API_VERSION = '0.0.1'
-DEBUG_ENABLED = False
+DEBUG_ENABLED = True
 MSGS = {
-	'CONFIG_FILE_IS_EMPTY': 'Configuration file is empty or not created. Please enter correct XDK folder in the prompt below.',
-	'CONFIG_STRING_IS_NOT_DIR': 'Path specified in configuration is not accessable. Please enter correct XDK folder in the prompt below.',
-	'SPECIFIED_DIRECTORY_IS_NOT_XDK': 'Path specified in configuration is not XDK one. Please enter correct XDK folder in the prompt below.',
+	'SPECIFIED_DIRECTORY_IS_NOT_XDK': 'Path specified in configuration is not Intel® XDK one. Please enter correct XDK folder in the prompt below.',
 	'CAN_NOT_PARSE_SERVER_DATA': 'Can not parse XDK server data file.',
-	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to XDK.',
-	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have XDK running?',
+	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to Intel® XDK.',
+	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have Intel® XDK running?',
 	'CAN_NOT_GET_FOLDER': 'Can not get current folder. Do you have project folder opened?',
 	'CAN_NOT_PARSE_RESPONSE_JSON': 'Can not parse response JSON',
-	'CAN_NOT_FIND_XDK': 'Can not find XDK installation'
+	'CAN_NOT_FIND_XDK': 'Can not find Intel® XDK installation'
 }
 ### E.O. CONFIGURATION
 
@@ -27,10 +25,8 @@ def _print(*args):
 		print(*args)
 
 class XDKException(Exception):
-	need_configuration = False
-	def __init__(self, value, need_configuration=False):
+	def __init__(self, value):
 		self.value = value
-		self.need_configuration = need_configuration
 	def __str__(self):
 		return repr(self.value)
 
@@ -51,8 +47,6 @@ class XDKPluginCore:
 
 	def make_request(self, addr, params={}, headers={}):
 		_print('make_request: addr=', addr);
-		#params = urllib.parse.urlencode(params).encode('utf-8')
-		#params_str = json.dumps(json)
 		if params:
 			params['_api_version'] = API_VERSION
 			params = json.dumps(params)
@@ -94,9 +88,8 @@ class XDKPluginCore:
 			except:
 				raise XDKException(MSGS['CAN_NOT_PARSE_RESPONSE_JSON'])
 		
-			if 'error' in parsed and parsed['error']:
-				error_msg = parsed['msg'] if 'msg' in parsed else 'Unknown error' 
-				raise XDKException(error_msg)
+			if parsed.get('error'):
+				raise XDKException(parsed.get('msg') or 'Unknown error')
 
 		except XDKException as e:
 			sublime.error_message(e.value)
@@ -107,17 +100,16 @@ class XDKPluginCore:
 	def get_data_path(self):
 		p = sys.platform
 		path = None
-		if p == 'darwin':
+		if p == 'darwin' and os.getenv('HOME'):
 			path = os.path.join(os.getenv('HOME'), 'Library', 'Application Support', 'XDK')
-		elif p == 'win32':
+		elif p == 'win32' and os.getenv('LOCALAPPDATA'):
 			path = os.path.join(os.getenv('LOCALAPPDATA'), 'XDK')
-		elif p == 'linux2':
+		elif p == 'linux2' and os.getenv('HOME'):
 			path = os.path.join(os.getenv('HOME'), '.config', 'XDK')
 		server_data = os.path.join(path, 'server-data.txt')
 		if path is None or not os.path.isfile(server_data) or not os.access(server_data, os.R_OK):
 			raise XDKException(MSGS['CAN_NOT_FIND_XDK']) 
 		return path
-
 
 
 	def load_config_data(self):
@@ -136,7 +128,7 @@ class XDKPluginCore:
 		self.server_data_path = os.path.join(self.xdk_dir, 'server-data.txt')
 		_print('load_config_data: server_data_path=', self.server_data_path)
 		if not os.path.isfile(self.server_data_path):
-			raise XDKException(MSGS['SPECIFIED_DIRECTORY_IS_NOT_XDK'], True)
+			raise XDKException(MSGS['SPECIFIED_DIRECTORY_IS_NOT_XDK'])
 		server_data_contents = None;
 		with open(self.server_data_path, 'r') as f:
 			server_data_contents = f.read()
@@ -150,7 +142,7 @@ class XDKPluginCore:
 			_print('load_config_data: base_path=' + self.base_path);
 			_print('load_config_data: plugin_base_path=' + self.plugin_base_path);
 		except:
-			raise XDKException(MSGS['CAN_NOT_PARSE_SERVER_DATA'], True);
+			raise XDKException(MSGS['CAN_NOT_PARSE_SERVER_DATA']);
 
 	def authorize(self):
 		if self.auth_cookie is not None:
@@ -158,12 +150,12 @@ class XDKPluginCore:
 			return 
 
 		_print('authorize: making request to /validate');	
-		response = self.make_request(self.base_path + '/validate', {}, {'x-xdk-local-session-secret': self.auth_secret });
+		response = self.make_request(self.base_path + '/validate', {}, {'x-xdk-local-session-secret': self.auth_secret })
 		cookies = dict(response.info().items())
-		_print('authorize: response.status=' + str(response.status));
-		_print('authorize: cookies length=', len(cookies));
+		_print('authorize: response.status=' + str(response.status))
+		_print('authorize: cookies length=' + str(len(cookies)))
 		if response.status != 200 or 'Set-Cookie' not in cookies: 
-			raise XDKException(MSGS['CAN_NOT_VALIDATE_SECRET_KEY']);
+			raise XDKException(MSGS['CAN_NOT_VALIDATE_SECRET_KEY'])
 		self.auth_cookie = cookies['Set-Cookie']
 		_print('authorize: auth_cookie=', self.auth_cookie);
 
@@ -192,11 +184,7 @@ class XDKPluginCore:
 			sublime.error_message(e.value);
 			
 		except Exception as e:
-			if (
-					isinstance(e, urllib.error.HTTPError) or
-					isinstance(e, urllib.error.URLError) or
-					isinstance(e, ConnectionRefusedError)
-				):
+			if isinstance(e, (urllib.error.HTTPError, urllib.error.URLError, ConnectionRefusedError)):
 				sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
 		return True
 
