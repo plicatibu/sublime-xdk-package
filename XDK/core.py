@@ -192,9 +192,15 @@ class XDKPluginCore:
 		folder = self.view.window().folders()[0]
 		regex = re.compile('.*\.xdk(e)?$')
 		xdk_files = [ f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f)) and regex.match(f) ]
+		xdk_file = None
+		if len(xdk_files) > 1:
+			dot_xdk_files = [ f for f in xdk_files if f[-4:] == '.xdk']
+			if len(dot_xdk_files):
+				xdk_file = dot_xdk_files[0]
+
 		return {
 			'folder': 				folder,
-			'contains_xdk_file': 	len(xdk_files) > 1,
+			'xdk_file':				xdk_file,
 			'filename': 			self.view.file_name()
 		}
 
