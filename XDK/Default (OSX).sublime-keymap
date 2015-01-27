@@ -1,7 +1,10 @@
 [{
 	"keys": ["alt+super+e"],
-	"command": "xdk_run_emulator"
+	"command": "xdk_run_emulator_docked"
 }, {
+	"keys": ["ctrl+super+e"],
+	"command": "xdk_run_emulator_undocked"
+},{
 	"keys": ["alt+super+p"],
 	"command": "xdk_run_test_push_files"
 }, {

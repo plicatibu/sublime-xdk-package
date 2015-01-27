@@ -3,8 +3,14 @@
 	"caption": "Intel® XDK",
 	"children": [
 		{
-			"command": "xdk_run_emulator",
-			"caption": "Run emulator"
+			"caption": "Emulator",
+			"children": [{
+				"caption": "Run",
+				"command": "xdk_run_emulator_docked"
+			}, {
+				"caption": "Run in separate window",
+				"command": "xdk_run_emulator_undocked"
+			}]
 		}, {
 			"caption": "Test",
 			"children": [{

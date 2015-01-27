@@ -10,10 +10,22 @@ class XdkCommand_(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
 
 ########## EMULATOR 
 
-class XdkRunEmulatorCommand(XdkCommand_):
+class XdkRunEmulatorDockedCommand(XdkCommand_):
 	def prepare_data(self):
 		data = self.prepare_request_data()
-		data.update(action='run_emulate')
+		data.update(
+			action='run_emulate',
+			method='run_docked'
+		)
+		return data
+
+class XdkRunEmulatorUndockedCommand(XdkCommand_):
+	def prepare_data(self):
+		data = self.prepare_request_data()
+		data.update(
+			action='run_emulate',
+			method='run_undocked'
+		)
 		return data
 
 ########## TEST 
