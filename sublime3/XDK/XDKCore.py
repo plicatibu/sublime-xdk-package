@@ -1,28 +1,49 @@
+# coding: utf-8
+
 import sublime, sublime_plugin
 import os
 import json
-import urllib.request
 import sys
 import re
+
+IS_PYTHON_2 = sys.version < '3'
+
+if IS_PYTHON_2:
+	from urllib2		import Request, urlopen, HTTPError, URLError
+else:
+	from urllib.request import Request, urlopen
+	from urllib.error 	import HTTPError, URLError
 
 ### CONFIGURATION
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
 API_VERSION = '0.0.1'
 DEBUG_ENABLED = True
 MSGS = {
-	'SPECIFIED_DIRECTORY_IS_NOT_XDK': 'Path specified in configuration is not Intel® XDK one. Please enter correct XDK folder in the prompt below.',
-	'CAN_NOT_PARSE_SERVER_DATA': 'Can not parse XDK server data file.',
-	'CAN_NOT_VALIDATE_SECRET_KEY': 'Can not authorize to Intel® XDK.',
-	'XDK_CONNECTION_FAILED': 'Connection to XDK failed. Do you have Intel® XDK running?',
-	'CAN_NOT_GET_FOLDER': 'Can not get current folder. Do you have project folder opened?',
-	'CAN_NOT_PARSE_RESPONSE_JSON': 'Can not parse response JSON',
-	'CAN_NOT_FIND_XDK': 'Can not find Intel® XDK installation'
+	'SPECIFIED_DIRECTORY_IS_NOT_XDK': u'Path specified in configuration is not Intel® XDK one. Please enter correct XDK folder in the prompt below.',
+	'CAN_NOT_PARSE_SERVER_DATA': u'Can not parse XDK server data file.',
+	'CAN_NOT_VALIDATE_SECRET_KEY': u'Can not authorize to Intel® XDK.',
+	'XDK_CONNECTION_FAILED': u'Connection to XDK failed. Do you have Intel® XDK running?',
+	'CAN_NOT_GET_FOLDER': u'Can not get current folder. Do you have project folder opened?',
+	'CAN_NOT_PARSE_RESPONSE_JSON': u'Can not parse response JSON',
+	'CAN_NOT_FIND_XDK': u'Can not find Intel® XDK installation'
 }
 ### E.O. CONFIGURATION
 
-def _print(*args):
+def _print(s):
 	if DEBUG_ENABLED:
-		print(*args)
+		print(s)
+
+class UrllibHelper:
+	@staticmethod
+	def is_connection_refused(exception):
+		return isinstance(exception, (HTTPError, URLError) if IS_PYTHON_2 else (HTTPError, URLError, ConnectionRefusedError))
+	@staticmethod
+	def extract_status(response):
+		#return response['code' if IS_PYTHON_2 else 'status'];
+		return getattr(response, 'code' if IS_PYTHON_2 else 'status')
+	@staticmethod
+	def extract_headers(response):
+		return response.headers if IS_PYTHON_2 else dict(response.info().items())
 
 class XDKException(Exception):
 	def __init__(self, value):
@@ -46,7 +67,7 @@ class XDKPluginCore:
 	auth_cookie = None
 
 	def make_request(self, addr, params={}, headers={}):
-		_print('make_request: addr=', addr);
+		_print('make_request: addr=' + addr);
 		if params:
 			params['_api_version'] = API_VERSION
 			params = json.dumps(params)
@@ -56,8 +77,8 @@ class XDKPluginCore:
 			params = ''
 
 
-		request = urllib.request.Request(addr, params.encode('utf-8'), headers)
-		response = urllib.request.urlopen(request)
+		request = Request(addr, params.encode('utf-8'), headers)
+		response = urlopen(request)
 		return response
 
 	def invoke_command(self, cmd):
@@ -66,7 +87,7 @@ class XDKPluginCore:
 				return self.make_request(self.plugin_base_path, cmd, {
 					'Cookie' : self.auth_cookie
 				})
-			except urllib.error.HTTPError as e:
+			except HTTPError as e:
 				_print("Caught HTTPError' " + str(e.code))
 				if (int(e.code) == 401):
 					_print('401, trying to get new one'); 
@@ -94,6 +115,7 @@ class XDKPluginCore:
 		except XDKException as e:
 			sublime.error_message(e.value)
 		except:
+			_print('invoke_command: not XDKException')
 			sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
 
 
@@ -117,7 +139,7 @@ class XDKPluginCore:
 			_print('load_config_data: already has plugn_base_path')
 			return
 
-		_print('load_config_data: trying to read CONFIG_FILE=', CONFIG_FILE);
+		_print('load_config_data: trying to read CONFIG_FILE=' + CONFIG_FILE);
 		with open(CONFIG_FILE, 'r') as f:
 			self.config_contents = f.read();
 		_print('load_config_data: CONFIG_FILE read')
@@ -126,7 +148,7 @@ class XDKPluginCore:
 		self.xdk_dir = self.config_contents.strip()
 		_print('load_config_data: xdk_dir=' + self.xdk_dir)
 		self.server_data_path = os.path.join(self.xdk_dir, 'server-data.txt')
-		_print('load_config_data: server_data_path=', self.server_data_path)
+		_print('load_config_data: server_data_path=' + self.server_data_path)
 		if not os.path.isfile(self.server_data_path):
 			raise XDKException(MSGS['SPECIFIED_DIRECTORY_IS_NOT_XDK'])
 		server_data_contents = None;
@@ -151,13 +173,14 @@ class XDKPluginCore:
 
 		_print('authorize: making request to /validate');	
 		response = self.make_request(self.base_path + '/validate', {}, {'x-xdk-local-session-secret': self.auth_secret })
-		cookies = dict(response.info().items())
-		_print('authorize: response.status=' + str(response.status))
-		_print('authorize: cookies length=' + str(len(cookies)))
-		if response.status != 200 or 'Set-Cookie' not in cookies: 
+		headers = UrllibHelper.extract_headers(response)
+		status = UrllibHelper.extract_status(response)
+		_print('authorize: response.status=' + str(status))
+		_print('authorize: headers length=' + str(len(headers)))
+		if status != 200 or 'Set-Cookie' not in headers: 
 			raise XDKException(MSGS['CAN_NOT_VALIDATE_SECRET_KEY'])
-		self.auth_cookie = cookies['Set-Cookie']
-		_print('authorize: auth_cookie=', self.auth_cookie);
+		self.auth_cookie = headers['Set-Cookie']
+		_print('authorize: auth_cookie=' + self.auth_cookie);
 
 	def reset_authorization(self):
 		self.xdk_dir = None
@@ -174,33 +197,43 @@ class XDKPluginCore:
 		_print('find_xdk_installation: found path' + path)
 		with open(CONFIG_FILE, 'w') as f:
 			f.write(path);		
+		_print('find_xdk_installation: CONFIG_FILE written')
 
 	def prepare(self):
+		_print('prepare:')
 		try:
 			self.find_xdk_installation()
 			self.load_config_data()
 			self.authorize()
+			return True
+
 		except XDKException as e:
 			sublime.error_message(e.value);
+			return False
 			
 		except Exception as e:
-			if isinstance(e, (urllib.error.HTTPError, urllib.error.URLError, ConnectionRefusedError)):
+			if UrllibHelper.is_connection_refused(e):
+				_print('prepare: is_connection_refused exception');
 				sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
-		return True
+				return False
+			else:
+				raise
+		
 
 	def prepare_request_data(self):
-		folder = self.view.window().folders()[0]
-		regex = re.compile('.*\.xdk(e)?$')
-		xdk_files = [ f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f)) and regex.match(f) ]
-		xdk_file = None
-		if len(xdk_files) > 1:
-			dot_xdk_files = [ f for f in xdk_files if f[-4:] == '.xdk']
-			if len(dot_xdk_files):
-				xdk_file = dot_xdk_files[0]
+		# opened_folder = self.view.window().folders()[0]
+		folder = os.path.dirname(self.view.file_name())
+		# regex = re.compile('.*\.xdk(e)?$')
+		# xdk_files = [ f for f in os.listdir(opened_folder) if os.path.isfile(os.path.join(opened_folder, f)) and regex.match(f) ]
+		# xdk_file = None
+		# if len(xdk_files) > 1:
+		# 	dot_xdk_files = [ f for f in xdk_files if f[-4:] == '.xdk']
+		# 	if len(dot_xdk_files):
+		# 		xdk_file = dot_xdk_files[0]
 
 		return {
 			'folder': 				folder,
-			'xdk_file':				xdk_file,
+		#	'xdk_file':				xdk_file,
 			'filename': 			self.view.file_name()
 		}
 

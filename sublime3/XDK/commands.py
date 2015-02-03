@@ -1,8 +1,14 @@
-import sublime, sublime_plugin
-import XDK.core
-from XDK.core import MSGS
+# coding: utf-8
 
-class XdkCommand_(sublime_plugin.TextCommand, XDK.core.XDKPluginCore):
+import sublime, sublime_plugin
+
+if sublime.version() < '3':
+	import XDKCore
+else:
+	import XDK.XDKCore as XDKCore
+
+
+class XdkCommand_(sublime_plugin.TextCommand, XDKCore.XDKPluginCore):
 	def run(self, edit):
 		if not self.prepare():
 			return
@@ -120,7 +126,7 @@ class XdkRunProfileCloseAppCommand(XdkCommand_):
 
 class XdkShowAboutCommand(sublime_plugin.ApplicationCommand):
 	def run(self):
-		sublime.message_dialog("""Intel® XDK HTML5 Cross-platform Development Tool enables developers to easily design, test, debug, and build HTML5 web and hybrid apps across multiple app stores and form factor devices.  
+		sublime.message_dialog(u"""Intel® XDK HTML5 Cross-platform Development Tool enables developers to easily design, test, debug, and build HTML5 web and hybrid apps across multiple app stores and form factor devices.  
 
 The Intel XDK plugin for Sublime Text* allows you to drive your HTML5 app emulation, testing, profiling, and builds from within Sublime Text; you just need to set up your project within the Intel XDK first.  
 
