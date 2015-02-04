@@ -18,19 +18,19 @@
 				"caption": "Push files to testing server"
 			}, {
 				"command": "xdk_run_test_begin_debugging",
-				"caption": "Begin debugging on device"
+				"caption": "Start Weinre session"
 			}]
 		}, {
 			"caption": "Debug",
 			"children": [{
 				"command": "xdk_run_debug_launch_app",
-				"caption": "Launch App on device"
+				"caption": "Launch app on device"
 			}, {
 				"command": "xdk_run_debug_debug_app",
-				"caption": "Debug App on device"
+				"caption": "Debug app on device"
 			}, {
 				"command": "xdk_run_debug_stop_app",
-				"caption": "Stop App on device"
+				"caption": "Stop app on device"
 			}]
 		}, {
 			"caption": "Profile",
@@ -39,7 +39,7 @@
 				"caption": "Start CPU profiling"
 			}, {
 				"command": "xdk_run_profile_memory_start",
-				"caption": "Start Memory profiling"
+				"caption": "Start memory profiling"
 			}, {
 				"command": "xdk_run_profile_stop",
 				"caption": "Stop profiling"
