@@ -13,6 +13,8 @@
 # Intel's suppliers or licensors in any way.
 
 import sublime, sublime_plugin
+import os
+import sys
 
 if sublime.version() < '3':
 	import XDKCore
@@ -133,6 +135,19 @@ class XdkRunProfileCloseAppCommand(XdkCommand_):
 			method='close_app'
 		)
 		return data
+
+########## CONFIGURE HOTKEYS	
+
+class XdkConfigureHotkeysCommand(sublime_plugin.WindowCommand):
+	def run(self):
+		files_map = {
+			'darwin': 'OSX',
+			'win32': 'Windows',
+			'linux2': 'Linux'
+		}
+		if sys.platform in files_map:
+			filename = 'Default (' + files_map[sys.platform] + ').sublime-keymap'
+			self.window.open_file(os.path.join(XDKCore.PLUGIN_PATH, filename))
 
 ########## ABOUT
 

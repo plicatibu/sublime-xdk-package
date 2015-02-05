@@ -27,7 +27,8 @@ else:
 	from urllib.error 	import HTTPError, URLError
 
 ### CONFIGURATION
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'xdk_plugin.conf');
+PLUGIN_PATH = os.path.dirname(os.path.abspath(__file__))
+CONFIG_FILE = os.path.join(PLUGIN_PATH, 'xdk_plugin.conf')
 API_VERSION = '0.0.1'
 DEBUG_ENABLED = True
 MSGS = {
@@ -233,19 +234,9 @@ class XDKPluginCore:
 		
 
 	def prepare_request_data(self):
-		# opened_folder = self.view.window().folders()[0]
 		folder = os.path.dirname(self.view.file_name())
-		# regex = re.compile('.*\.xdk(e)?$')
-		# xdk_files = [ f for f in os.listdir(opened_folder) if os.path.isfile(os.path.join(opened_folder, f)) and regex.match(f) ]
-		# xdk_file = None
-		# if len(xdk_files) > 1:
-		# 	dot_xdk_files = [ f for f in xdk_files if f[-4:] == '.xdk']
-		# 	if len(dot_xdk_files):
-		# 		xdk_file = dot_xdk_files[0]
-
 		return {
 			'folder': 				folder,
-		#	'xdk_file':				xdk_file,
 			'filename': 			self.view.file_name()
 		}
 
