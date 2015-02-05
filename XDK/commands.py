@@ -162,7 +162,7 @@ See XXX for more information about the Intel® XDK Sublime Text* plugin.
 Please see http://xdk.intel.com for more information about the Intel® XDK and for support.
 
 *Other names and brands may be claimed as the property of others.   
-Copyright (c) 2013-2014 Intel Corporation. All Rights Reserved.
+Copyright (c) 2013-2015 Intel Corporation. All Rights Reserved.
 """)
 
 
