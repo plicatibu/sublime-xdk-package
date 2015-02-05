@@ -30,7 +30,7 @@ else:
 PLUGIN_PATH = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(PLUGIN_PATH, 'xdk_plugin.conf')
 API_VERSION = '0.0.1'
-DEBUG_ENABLED = True
+DEBUG_ENABLED = False 
 MSGS = {
 	'SPECIFIED_DIRECTORY_IS_NOT_XDK': u'Path specified in configuration is not Intel® XDK one. Please enter correct XDK folder in the prompt below.',
 	'CAN_NOT_PARSE_SERVER_DATA': u'Can not parse XDK server data file.',
@@ -52,7 +52,6 @@ class UrllibHelper:
 		return isinstance(exception, (HTTPError, URLError) if IS_PYTHON_2 else (HTTPError, URLError, ConnectionRefusedError))
 	@staticmethod
 	def extract_status(response):
-		#return response['code' if IS_PYTHON_2 else 'status'];
 		return getattr(response, 'code' if IS_PYTHON_2 else 'status')
 	@staticmethod
 	def extract_headers(response):
