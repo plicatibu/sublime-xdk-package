@@ -157,7 +157,7 @@ class XdkShowAboutCommand(sublime_plugin.ApplicationCommand):
 
 The Intel® XDK plugin for Sublime Text* allows you to drive your HTML5 app emulation, testing, profiling, and builds from within Sublime Text; you just need to set up your project within the Intel® XDK first.  
 
-See XXX for more information about the Intel® XDK Sublime Text* plugin.  
+See https://github.com/gomobile/sublime-xdk-package for more information about the Intel® XDK Sublime Text* plugin.  
 
 Please see http://xdk.intel.com for more information about the Intel® XDK and for support.
 
