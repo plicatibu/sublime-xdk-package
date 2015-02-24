@@ -30,12 +30,12 @@ else:
 PLUGIN_PATH = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(PLUGIN_PATH, 'xdk_plugin.conf')
 API_VERSION = '0.0.1'
-DEBUG_ENABLED = False 
+DEBUG_ENABLED = True 
 MSGS = {
-	'SPECIFIED_DIRECTORY_IS_NOT_XDK': u'Path specified in configuration is not Intel® XDK one. Please enter correct XDK folder in the prompt below.',
-	'CAN_NOT_PARSE_SERVER_DATA': u'Can not parse XDK server data file.',
+	'SPECIFIED_DIRECTORY_IS_NOT_XDK': u'Path specified in configuration is not Intel® XDK one. Please enter correct Intel® XDK folder in the prompt below.',
+	'CAN_NOT_PARSE_SERVER_DATA': u'Can not parse Intel® XDK server data file.',
 	'CAN_NOT_VALIDATE_SECRET_KEY': u'Can not authorize to Intel® XDK.',
-	'XDK_CONNECTION_FAILED': u'Connection to XDK failed. Do you have Intel® XDK running?',
+	'XDK_CONNECTION_FAILED': u'Connection to Intel® XDK failed. Do you have Intel® XDK running?',
 	'CAN_NOT_GET_FOLDER': u'Can not get current folder. Do you have project folder opened?',
 	'CAN_NOT_PARSE_RESPONSE_JSON': u'Can not parse response JSON',
 	'CAN_NOT_FIND_XDK': u'Can not find Intel® XDK installation'
