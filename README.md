@@ -27,17 +27,17 @@ Sublime Text.
 The Sublime Text plugins folders are usually located in the following places:
 
 -   Windows:  
-    `%AppData%\Sublime Text X\Packages`  
+    `"%AppData%\Sublime Text X\Packages"`  
     where 'X' is ‘2' or ‘3' depending on the version of your Sublime Text
     editor.
 
 -   Mac OS X:  
-    `~/Library/Application Support/Sublime Text X/Packages`  
+    `~/Library/Application\\ Support/Sublime\\ Text\\ X/Packages`  
     where ‘X' is ‘2' or ‘3' depending on the version of your Sublime Text
     editor.
 
 -   Linux:  
-    usually `~/.Sublime Text X/Packages`  
+    usually `~/.Sublime\\ Text\\ X/Packages`  
     where ‘X' is ‘2' or ‘3', but may vary.
 
 Most of the features of this plugin require that the Intel XDK is running on the
