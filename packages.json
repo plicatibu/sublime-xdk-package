@@ -1,0 +1,20 @@
+{
+	"schema_version": "3.0.0",
+	"packages": [
+		{
+			"name": "IntelXDK",
+			"details": "https://github.com/gomobile/sublime-xdk-package",
+			"description": "Package allows you to direct several key Intel XDK activities",
+			"homepage": "https://github.com/gomobile/sublime-xdk-package",
+			"author": "Intel Corporation",
+			"readme": "https://raw.githubusercontent.com/gomobile/sublime-xdk-package/master/README.md",
+			"labels": ["js", "utilities", "preview", "testing", "commands", "android", "debugger"],
+			"releases": [
+				{
+					"sublime_text": "*",
+					"tags": true
+				}
+			]
+		}
+	]
+}
