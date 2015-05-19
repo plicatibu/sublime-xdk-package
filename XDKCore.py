@@ -138,7 +138,7 @@ class XDKPluginCore:
 			path = os.path.join(os.getenv('HOME'), 'Library', 'Application Support', 'XDK')
 		elif p == 'win32' and os.getenv('LOCALAPPDATA'):
 			path = os.path.join(os.getenv('LOCALAPPDATA'), 'XDK')
-		elif p == 'linux2' and os.getenv('HOME'):
+		elif p in ('linux2', 'linux') and os.getenv('HOME'):
 			path = os.path.join(os.getenv('HOME'), '.config', 'XDK')
 		server_data = os.path.join(path, 'server-data.txt')
 		if path is None or not os.path.isfile(server_data) or not os.access(server_data, os.R_OK):
