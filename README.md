@@ -1,8 +1,9 @@
 sublime-xdk-package
 ===================
 
-This repo contains a package for the [Sublime Text editor][1] that allows you to
-direct several key Intel XDK activities, including:
+This repo contains a package for the [Sublime Text editor][1] that allows 
+you to control several key Intel XDK activities from within the Sublime
+Text editor, including:
 
 [1]: <http://www.sublimetext.com>
 
@@ -26,36 +27,21 @@ Sublime Text. [Follow this link to download a ZIP file][2] of the plugin.
 
 [2]: <https://github.com/gomobile/sublime-xdk-package/archive/master.zip>
 
-The Sublime Text plugins folders are usually located in the following places:
+The Sublime Text 3 plugins folders are usually located in the following places:
 
 -   Windows:  
-    `"%AppData%\Sublime Text X\Packages"`  
-    where 'X' is ‘2' or ‘3' depending on the version of your Sublime Text
-    editor.
+    `"%AppData%\Sublime Text 3\Packages"` 
 
 -   Mac OS X:  
-    `~/Library/Application\ Support/Sublime\ Text\ X/Packages`  
-    where ‘X' is ‘2' or ‘3' depending on the version of your Sublime Text
-    editor.
+    `~/Library/Application\ Support/Sublime\ Text\ 3/Packages`  
 
 -   Linux:  
-    usually `~/.Sublime\ Text\ X/Packages`  
-    where ‘X' is ‘2' or ‘3', but may vary.
+    `~/.config/sublime-text-3/Packages/XDK`
 
-    If you installed Sublime Text via `apt-get`, the Packages folder may be
-    located here: `/opt/sublime_text/Packages` on your system.
+If you are using Sublime Text 2 you should be able to replace the `3` in each
+location (above) with a `2` to find the Sublime Text plugin folder on your
+system.
 
-    If you cannot find the `Packages` folder, try the following command:
-    `$ sudo find / -name Packages -type d`
-
-    On a Linux machine you may need to convert the XDK folder into a Sublime
-    Text package. Sublime Text packages are simply ZIP archives with the 
-    extension `.sublime-package`
-    
-```
-    $ zip -b . XDK.sublime-package ./XDK/*
-    $ sudo cp XDK.sublime-package /opt/sublime_text/Packages
-```
 Most of the features of this plugin require that the Intel XDK is running on the
 same system as your Sublime Text editor, and that you are logged into the Intel
 XDK.
@@ -70,4 +56,4 @@ Console. The last 10 lines are generally enough.
 Detailed Instructions
 ---------------------
 
-under construction… more to be provided.
+Under construction… more to be provided.
