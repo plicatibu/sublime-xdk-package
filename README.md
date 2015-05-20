@@ -22,7 +22,9 @@ Installation
 ------------
 
 Extract the “XDK” folder into your Sublime Text plugin folder and restart
-Sublime Text.
+Sublime Text. [Follow this link to download a ZIP file][2] of the plugin.
+
+[2]: <https://github.com/gomobile/sublime-xdk-package/archive/master.zip>
 
 The Sublime Text plugins folders are usually located in the following places:
 
@@ -40,16 +42,30 @@ The Sublime Text plugins folders are usually located in the following places:
     usually `~/.Sublime\ Text\ X/Packages`  
     where ‘X' is ‘2' or ‘3', but may vary.
 
+    If you installed Sublime Text via `apt-get`, the Packages folder may be
+    located here: `/opt/sublime_text/Packages` on your system.
+
+    If you cannot find the `Packages` folder, try the following command:
+    `$ sudo find / -name Packages -type d`
+
+    On a Linux machine you may need to convert the XDK folder into a Sublime
+    Text package. Sublime Text packages are simply ZIP archives with the 
+    extension `.sublime-package`
+    
+```
+    $ zip -b . XDK.sublime-package ./XDK/*
+    $ sudo cp XDK.sublime-package /opt/sublime_text/Packages
+```
 Most of the features of this plugin require that the Intel XDK is running on the
 same system as your Sublime Text editor, and that you are logged into the Intel
 XDK.
 
 If you wish to report a bug, please include any log messages from Sublime Text
-in your bug report and post your issue on the [Intel XDK forum][2]. To view log
+in your bug report and post your issue on the [Intel XDK forum][3]. To view log
 messages you can open the Sublime Text console using Ctrl+\` or View -\> Show
 Console. The last 10 lines are generally enough.
 
-[2]: <http://software.intel.com/en-us/forums/intel-xdk>
+[3]: <http://software.intel.com/en-us/forums/intel-xdk>
 
 Detailed Instructions
 ---------------------
