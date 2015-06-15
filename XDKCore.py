@@ -27,8 +27,7 @@ else:
 	from urllib.error 	import HTTPError, URLError
 
 ### CONFIGURATION
-PLUGIN_PATH = os.path.dirname(os.path.abspath(__file__))
-CONFIG_FILE = os.path.join(PLUGIN_PATH, 'xdk_plugin.conf')
+CONFIG_FILE = "intel_xdk_plugin.conf"
 API_VERSION = '0.0.1'
 DEBUG_ENABLED = True 
 MSGS = {
@@ -78,8 +77,12 @@ class XDKPluginCore:
 	auth_secret = None
 	auth_cookie = None
 
+	def get_config_path(self):
+		return os.path.join(os.path.realpath(sublime.packages_path()), "User", CONFIG_FILE)
+
+
 	def make_request(self, addr, params={}, headers={}):
-		_print('make_request: addr=' + addr);
+		_print('make_request: addr=' + addr)
 		if params:
 			params['_api_version'] = API_VERSION
 			params = json.dumps(params)
@@ -102,7 +105,7 @@ class XDKPluginCore:
 			except HTTPError as e:
 				_print("Caught HTTPError' " + str(e.code))
 				if (int(e.code) == 401):
-					_print('401, trying to get new one'); 
+					_print('401, trying to get new one') 
 					self.reset_authorization()
 					self.prepare()
 					return self.make_request(self.plugin_base_path, cmd, {
@@ -115,7 +118,7 @@ class XDKPluginCore:
 			response = _make_request()
 			content = response.read()
 			_print('invoke_command: content=')
-			_print(content);
+			_print(content)
 			try:
 				parsed = json.loads(content.decode())
 			except:
@@ -151,10 +154,10 @@ class XDKPluginCore:
 			_print('load_config_data: already has plugn_base_path')
 			return
 
-		_print('load_config_data: trying to read CONFIG_FILE=' + CONFIG_FILE);
-		with open(CONFIG_FILE, 'r') as f:
-			self.config_contents = f.read();
-		_print('load_config_data: CONFIG_FILE read')
+		_print('load_config_data: trying to read config file=' + self.get_config_path())
+		with open(self.get_config_path(), 'r') as f:
+			self.config_contents = f.read()
+		_print('load_config_data: config file read')
 		if not self.config_contents:
 			self.find_xdk_installation()
 		self.xdk_dir = self.config_contents.strip()
@@ -163,27 +166,27 @@ class XDKPluginCore:
 		_print('load_config_data: server_data_path=' + self.server_data_path)
 		if not os.path.isfile(self.server_data_path):
 			raise XDKException(MSGS['SPECIFIED_DIRECTORY_IS_NOT_XDK'])
-		server_data_contents = None;
+		server_data_contents = None
 		with open(self.server_data_path, 'r') as f:
 			server_data_contents = f.read()
-		_print('load_config_data: server_data_contents=' + server_data_contents);	
+		_print('load_config_data: server_data_contents=' + server_data_contents)	
 		try:
 			decoded = json.loads(server_data_contents.replace('[END]', ''))
 			self.auth_secret = decoded['secret']
-			self.base_path = 'http://localhost:' + str(decoded['port']);
+			self.base_path = 'http://localhost:' + str(decoded['port'])
 			self.plugin_base_path = 'http://localhost:' + str(decoded['port']) + '/http-services/plugin-listener/plugin/entrance'
-			_print('load_config_data: auth_secret=' + self.auth_secret);
-			_print('load_config_data: base_path=' + self.base_path);
-			_print('load_config_data: plugin_base_path=' + self.plugin_base_path);
+			_print('load_config_data: auth_secret=' + self.auth_secret)
+			_print('load_config_data: base_path=' + self.base_path)
+			_print('load_config_data: plugin_base_path=' + self.plugin_base_path)
 		except:
-			raise XDKException(MSGS['CAN_NOT_PARSE_SERVER_DATA']);
+			raise XDKException(MSGS['CAN_NOT_PARSE_SERVER_DATA'])
 
 	def authorize(self):
 		if self.auth_cookie is not None:
-			_print('authorize: auth_cookie is not none');
+			_print('authorize: auth_cookie is not none')
 			return 
 
-		_print('authorize: making request to /validate');	
+		_print('authorize: making request to /validate')	
 		response = self.make_request(self.base_path + '/validate', {}, {'x-xdk-local-session-secret': self.auth_secret })
 		headers = UrllibHelper.extract_headers(response)
 		status = UrllibHelper.extract_status(response)
@@ -192,7 +195,7 @@ class XDKPluginCore:
 		if status != 200 or 'Set-Cookie' not in headers: 
 			raise XDKException(MSGS['CAN_NOT_VALIDATE_SECRET_KEY'])
 		self.auth_cookie = headers['Set-Cookie']
-		_print('authorize: auth_cookie=' + self.auth_cookie);
+		_print('authorize: auth_cookie=' + self.auth_cookie)
 
 	def reset_authorization(self):
 		self.xdk_dir = None
@@ -207,9 +210,9 @@ class XDKPluginCore:
 			return self.xdk_dir 	
 		path = self.get_data_path()
 		_print('find_xdk_installation: found path' + path)
-		with open(CONFIG_FILE, 'w') as f:
-			f.write(path);		
-		_print('find_xdk_installation: CONFIG_FILE written')
+		with open(self.get_config_path(), 'w') as f:
+			f.write(path)		
+		_print('find_xdk_installation: config file written')
 
 	def prepare(self):
 		_print('prepare:')
@@ -220,12 +223,12 @@ class XDKPluginCore:
 			return True
 
 		except XDKException as e:
-			sublime.error_message(e.value);
+			sublime.error_message(e.value)
 			return False
 			
 		except Exception as e:
 			if UrllibHelper.is_connection_refused(e):
-				_print('prepare: is_connection_refused exception');
+				_print('prepare: is_connection_refused exception')
 				sublime.error_message(MSGS['XDK_CONNECTION_FAILED'])
 				return False
 			else:

@@ -16,13 +16,10 @@ import sublime, sublime_plugin
 import os
 import sys
 
-__file__ = os.path.normpath(os.path.abspath(__file__));
-__path__ = os.path.dirname(__file__)
-
-if __path__ not in sys.path:
-	sys.path.insert(0, __path__)
-
-import XDKCore
+if int(sublime.version()) >= 3000:
+	from . import XDKCore
+else:
+	import XDKCore
 
 class XdkCommand_(sublime_plugin.TextCommand, XDKCore.XDKPluginCore):
 	def run(self, edit):
