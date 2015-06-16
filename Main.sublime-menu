@@ -47,11 +47,6 @@
 		}, {
 			"caption": "-"
 		}, {
-			"command": "xdk_configure_hotkeys",
-			"caption": "Configure hotkeys"
-		}, {
-			"caption": "-"
-		}, {
 			"command": "xdk_show_about",
 			"caption": "About Intel® XDK"
 		}
