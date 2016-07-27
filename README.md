@@ -1,3 +1,7 @@
+> **NOTE:** This Sublime package has been deprecated (as of July, 2016) 
+> and is no longer being supported. It will be retired in the near future
+> and will be removed from the `gomobile` GitHub repository.
+
 sublime-xdk-package
 ===================
  
